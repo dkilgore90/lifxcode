@@ -2443,9 +2443,15 @@ private Map flattenedDescriptors() {
                 STATE_EXTENDED_COLOR_ZONES: [type: 512, descriptor: 'zone_count:w;index:w;colors_count:b;colors:ha82'],
         ],
         TILE: [
-                GET_TILE_EFFECT  : [type: 718, descriptor: ''],
-                SET_TILE_EFFECT  : [type: 719, descriptor: 'reserved1Effect:b;reserved2Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved3Effect:i;reserved4Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
-                STATE_TILE_EFFECT: [type: 720, descriptor: 'reserved1Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved2Effect:i;reserved3Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
+                GET_DEVICE_CHAIN  : [type: 701, descriptor: ''],
+                //TODO: define tile device section of a packet
+                STATE_DEVICE_CHAIN: [type: 702, descriptor: 'start_index:b;tile_devices:<TILEx16>;total_count:b'],
+                GET_TILE_STATE    : [type: 707, descriptor: 'tile_index:b;length:b;reserved1Tile:b;x:b;y:b;width:b'],
+                STATE_TILE_STATE  : [type: 711, descriptor: 'tile_index:b;reserved1Tile:b;x:b;y:b;width:b;colors:ha64'],
+                SET_TILE_STATE    : [type: 715, descriptor: 'tile_index:b;length:b;reserved1Tile:b;x:b;y:b;width:b;duration:i;colors:ha64'],
+                GET_TILE_EFFECT   : [type: 718, descriptor: ''],
+                SET_TILE_EFFECT   : [type: 719, descriptor: 'reserved1Effect:b;reserved2Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved3Effect:i;reserved4Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
+                STATE_TILE_EFFECT : [type: 720, descriptor: 'reserved1Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved2Effect:i;reserved3Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
         ]
 ]
 
