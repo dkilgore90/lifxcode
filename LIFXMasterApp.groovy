@@ -1893,6 +1893,10 @@ private void processSegment(Map result, List<Long> data, Map item, name, boolean
             Map color = parseBytes 'hue:w;saturation:w;brightness:w,kelvin:w', data
             result.put name, color
             break
+        case 'M':
+            Map tile = parseBytes 'accel_meas_x:w;accel_meas_y:w;accel_meas_z:w;reserved1Tile:w;user_x:f;user_y:f;width:b;height:b;reserved2Tile:w;device_version_vendor:i;device_version_product:i;device_version_version:i;firmware_build:l;reserved3Tile:l;firmware_version_minor:w;firmware_version_major:w;reserved4Tile:i', data
+            result.put name, tile
+            break
         default:
             throw new RuntimeException("Unexpected item kind '$kind'")
     }
@@ -1977,13 +1981,14 @@ private Number itemLength(String kind) {
         case 'H': return 8
         case 'F': return 4
         case 'T': return 1 // length of character
+        case 'M': return 55
         default:
             throw new RuntimeException("Unexpected item kind '$kind'")
     }
 }
 
 private List<Map> makeDescriptor(String desc) {
-    desc.findAll(~/(\w+):([bBwWiIlLhHfFtT][aA]?)(\d+)?/) {
+    desc.findAll(~/(\w+):([bBwWiIlLhHfFtTmM][aA]?)(\d+)?/) {
         full ->
             def theKind = full[2].toUpperCase()
             def baseKind = theKind[0]
@@ -2445,10 +2450,10 @@ private Map flattenedDescriptors() {
         TILE: [
                 GET_DEVICE_CHAIN  : [type: 701, descriptor: ''],
                 //TODO: define tile device section of a packet
-                STATE_DEVICE_CHAIN: [type: 702, descriptor: 'start_index:b;tile_devices:<TILEx16>;total_count:b'],
-                GET_TILE_STATE    : [type: 707, descriptor: 'tile_index:b;length:b;reserved1Tile:b;x:b;y:b;width:b'],
-                STATE_TILE_STATE  : [type: 711, descriptor: 'tile_index:b;reserved1Tile:b;x:b;y:b;width:b;colors:ha64'],
-                SET_TILE_STATE    : [type: 715, descriptor: 'tile_index:b;length:b;reserved1Tile:b;x:b;y:b;width:b;duration:i;colors:ha64'],
+                STATE_DEVICE_CHAIN: [type: 702, descriptor: 'start_index:b;tile_devices:ma16;total_count:b'],
+                GET_TILE_STATE    : [type: 707, descriptor: 'tile_index:b;length:b;reserved1State:b;x:b;y:b;width:b'],
+                STATE_TILE_STATE  : [type: 711, descriptor: 'tile_index:b;reserved1State:b;x:b;y:b;width:b;colors:ha64'],
+                SET_TILE_STATE    : [type: 715, descriptor: 'tile_index:b;length:b;reserved1State:b;x:b;y:b;width:b;duration:i;colors:ha64'],
                 GET_TILE_EFFECT   : [type: 718, descriptor: ''],
                 SET_TILE_EFFECT   : [type: 719, descriptor: 'reserved1Effect:b;reserved2Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved3Effect:i;reserved4Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
                 STATE_TILE_EFFECT : [type: 720, descriptor: 'reserved1Effect:b;instanceId:i;type:b;speed:i;duration:l;reserved2Effect:i;reserved3Effect:i;parameters:ia8;palette_count:b;palette:ha8'],
