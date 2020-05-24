@@ -98,7 +98,7 @@ def setMatrix(String colors, duration = 0) {
             hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
         }
     }
-    sendActions parent.deviceSetTileState(0, 1, state.transitionTime ?: duration, colorsMap)
+    sendActions parent.deviceSetTileState(0, 1, 5, state.transitionTime ?: duration, colorsMap)
 }
 
 def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) {
