@@ -180,7 +180,7 @@ def setTiles(index, String colors, length = 1, duration = 0) {
             hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
         }
     }
-    sendActions parent.deviceSetTileState(index, length, state.transitionTime ?: duration, colorsMap)
+    sendActions parent.deviceSetTileState(index, length, 8, state.transitionTime ?: duration, colorsMap)
 }
 
 def childSetTiles(index, Map colors, duration = 0) {
@@ -199,7 +199,7 @@ def childSetTiles(index, Map colors, duration = 0) {
             hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
         }
     }
-    sendActions parent.deviceSetTileState(index, 1, state.transitionTime ?: duration, colors)
+    sendActions parent.deviceSetTileState(index, 1, 8, state.transitionTime ?: duration, colors)
 }
 
 def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) {
