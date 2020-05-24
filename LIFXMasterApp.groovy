@@ -708,6 +708,12 @@ Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer 
     actions
 }
 
+Map<String, List> deviceSetTileState(index, length, duration, List hsbkList) {
+    def actions = makeActions()
+    actions.commands << makeCommand('TILE.SET_TILE_STATE', [tile_index: index, length: length, duration: duration, colors: hsbkList]
+    actions
+}
+
 Map<String, List> deviceSetColor(com.hubitat.app.DeviceWrapper device, Map colorMap, Boolean displayed, duration = 0) {
     def hsbkMap = getCurrentHSBK device
     hsbkMap << getScaledColorMap(colorMap)
@@ -895,6 +901,17 @@ List<Map> parseForDevice(device, String description, Boolean displayed, Boolean 
             def effects = ['OFF', 'RESERVED', 'MORPH', 'FLAME']
             return [
                 [name: 'effect', value: effects[data.type as int], displayed: true]
+            ]
+        case messageType['TILE.STATE_DEVICE_CHAIN']:
+            Map data = parsePayload 'TILE.STATE_DEVICE_CHAIN', header
+            return [
+                [name: 'deviceChain', value: data.total_count as int, data: data, displayed: true]
+            ]
+        case messageType['TILE.STATE_TILE_STATE']:
+            Map data = parsePayload 'TILE.STATE_TILE_STATE', header
+            data.matrixHtml = renderMatrix(data)
+            return [
+                [name: 'tileState', data: data, displayed: false]
             ]
         default:
             logWarn "Unhandled response for ${header.type}"
@@ -2449,7 +2466,6 @@ private Map flattenedDescriptors() {
         ],
         TILE: [
                 GET_DEVICE_CHAIN  : [type: 701, descriptor: ''],
-                //TODO: define tile device section of a packet
                 STATE_DEVICE_CHAIN: [type: 702, descriptor: 'start_index:b;tile_devices:ma16;total_count:b'],
                 GET_TILE_STATE    : [type: 707, descriptor: 'tile_index:b;length:b;reserved1State:b;x:b;y:b;width:b'],
                 STATE_TILE_STATE  : [type: 711, descriptor: 'tile_index:b;reserved1State:b;x:b;y:b;width:b;colors:ha64'],
@@ -2547,5 +2563,30 @@ Map getZones(String compressed) {
     [index: 0, zone_count: numZones, colors_count: numZones, colors: realColors]
 }
 
+String renderMatrix(HashMap hashMap) {
+    def builder = new StringBuilder();
+    builder << '<table cellspacing="0">'
+    def width = hashMap.width as Integer
+    def rows = Math.ceil(64 / width)
+    Map<Integer, Map> colours = hashMap.colors
+    for (int i = 0; i < rows; i++) {
+        builder << '<tr>'
+        for (int j = 0; j < width; j++) {
+            def index = (i * width) + j
+            String rgb
+            if (index < 64) {
+                colour = colours[index];
+                rgb = renderDatum(colours[index])
+            } else {
+                rgb = '#FFFFFF'
+            }
+                builder << '<td height="2" width="2" style="background-color:' + rgb + ';color:' + rgb + '">&nbsp;'
+        }
+        builder << '</tr>'
+    }
+    builder << '</table>'
+    def result = builder.toString()
 
+    result
+}
 

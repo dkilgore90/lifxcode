@@ -1,4 +1,5 @@
 import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
 
 /**
  *
@@ -23,7 +24,9 @@ metadata {
         attribute "group", "string"
         attribute "location", "string"
         attribute "effect", "string"
+        attribute "deviceChain", "number"
         
+        command "setTiles", [[name: "Tile index*", type: "NUMBER"], [name: "Colors*", type: "JSON_OBJECT"], [name: "Number of tiles", type: "NUMBER"], [name: "Duration", type: "NUMBER"]]
         command "setEffect", [[name: "Effect type*", type: "ENUM", constraints: ["FLAME", "MORPH", "OFF"]], [name: "Colors", type: "JSON_OBJECT"], [name: "Palette Count", type: "NUMBER"], [name: "Speed", type: "NUMBER"]]
     }
 
@@ -49,6 +52,7 @@ def initialize() {
     state.useActivityLog = useActivityLogFlag
     state.useActivityLogDebug = useDebugActivityLogFlag
     unschedule()
+    getDeviceChain()
     requestInfo()
     runEvery1Minute poll
 }
@@ -62,11 +66,89 @@ def refresh() {
 def poll() {
     parent.lifxQuery(device, 'DEVICE.GET_POWER') { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
+    //If we pass a length > 1, LIFX will send multiple responses, 1 for each tile
+    //Workaround to parse TILE.STATE_TILE_STATE for each tile
+    for (int i = 0; i < state.tileCount ?: 1; i++) {
+        parent.lifxCommand(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 8]) { List buffer -> sendPacket buffer, true } }
+    
+    }
     parent.lifxQuery(device, 'TILE.GET_TILE_EFFECT') { List buffer -> sendPacket buffer }
 }
 
 def requestInfo() {
-    parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
+    poll()
+}
+
+def getDeviceChain() {
+    parent.lifxQuery(device, 'TILE.GET_DEVICE_CHAIN') { List buffer -> sendPacket buffer }
+}
+
+def processChainData(data) {
+    state.tileCount = data.total_count
+    for (i=0; i<data.total_count; i++) {
+        try {
+            addChildDevice(
+                'robheyes',
+                'LIFX Tile Child',
+                device.getDeviceNetworkId() + "_tile$i",
+                [
+                        label   : "device.getDisplayName() Tile $i",
+                        index   : "$i"
+                ]
+            )
+        } catch (com.hubitat.app.exception.UnknownDeviceTypeException e) {
+            logWarn "${e.message} - you need to install the appropriate driver"
+        } catch (IllegalArgumentException ignored) {
+            // Intentionally ignored. Expected if device already present
+        }
+    }
+    def children = getChildDevices()
+    for (child in children) {
+        def index = child.getDataValue("index") as Integer
+        child.sendEvent(name: "width", value: data.tile_devices[index].width)
+        child.sendEvent(name: "height", value: data.tile_devices[index].height)
+        child.sendEvent(name: "user_x", value: data.tile_devices[index].user_x)
+        child.sendEvent(name: "user_y", value: data.tile_devices[index].user_y)
+        child.sendEvent(name: "rotation", value: determineRotation(data.tile_devices[index].accel_meas_x, data.tile_devices[index].accel_meas_y, data.tile_devices[index].accel_meas_z))
+    }
+}
+
+def updateTileChild(data) {
+    def index = data.tile_index
+    def child = getChildDevice(device.getDeviceNetworkId() + "_tile$index")
+    child.sendEvent(name: "matrix", value: data.matrixHtml)
+    child.sendEvent(name: "lastMatrix", value: JsonOutput.toJson(data.colors))
+}
+
+def determineRotation(int x, int y, int z) {
+    def absX = Math.abs(x)
+    def absY = Math.abs(y)
+    def absZ = Math.abs(z)
+    if (x == -1 && y == -1 && z == -1) {
+    // Invalid data, assume right-side up.
+        return "rightSideUp"
+
+    } else if (absX > absY && absX > absZ) {
+        if (x > 0) {
+            return "rotateRight"
+        } else {
+            return "rotateLeft"
+        }
+
+    } else if (absZ > absX && absZ > absY) {
+        if (z > 0) {
+            return "faceDown"
+        } else {
+            return "faceUp"
+        }
+
+    } else {
+        if (y > 0) {
+            return "upsideDown"
+        } else {
+            return "rightSideUp"
+        }
+    }
 }
 
 def on() {
@@ -76,6 +158,48 @@ def on() {
 
 def off() {
     sendActions parent.deviceOnOff('off', getUseActivityLog(), state.transitionTime ?: 0)
+}
+
+def setTiles(index, String colors, length = 1, duration = 0) {
+    def child = getChildDevice(device.getDeviceNetworkId + "_tile$index")
+    def childState = child.getState()
+    def colorsMap = new JsonSlurper().parseText(childState.lastMatrix)
+    colorsMap << new JsonSlurper().parseText(colors)
+    def hsbkList = new Map<String, Object>[64]
+    for (int i = 0; i < 64; i++) {
+        String namedColor = colorsMap[i].color ?: colorsMap[i].colour
+        if (namedColor) {
+            Map myColor
+            myColor = (null == namedColor) ? null : parent.lookupColor(namedColor.replace('_', ' '))
+            hsbkList[i] = [
+                hue       : parent.scaleUp(myColor.h ?: 0, 360),
+                saturation: parent.scaleUp100(myColor.s ?: 0),
+                brightness: parent.scaleUp100(myColor.v ?: 50)
+            ]
+        } else {
+            hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
+        }
+    }
+    sendActions parent.deviceSetTileState(index, length, state.transitionTime ?: duration, colorsMap)
+}
+
+def childSetTiles(index, Map colors, duration = 0) {
+    def hsbkList = new Map<String, Object>[64]
+    for (int i = 0; i < 64; i++) {
+        String namedColor = colorsList[i].color ?: colorsList[i].colour
+        if (namedColor) {
+            Map myColor
+            myColor = (null == namedColor) ? null : parent.lookupColor(namedColor.replace('_', ' '))
+            hsbkList[i] = [
+                hue       : parent.scaleUp(myColor.h ?: 0, 360),
+                saturation: parent.scaleUp100(myColor.s ?: 0),
+                brightness: parent.scaleUp100(myColor.v ?: 50)
+            ]
+        } else {
+            hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
+        }
+    }
+    sendActions parent.deviceSetTileState(index, 1, state.transitionTime ?: duration, colors)
 }
 
 def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) {
@@ -97,7 +221,7 @@ def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) 
                     brightness: parent.scaleUp100(myColor.v ?: 50)
                 ]
             } else {
-                hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
+                hsbkList[i] = parent.getScaledColorMap(colorsList[i])
             }
         } else {
             hsbkList[i] = [hue: 0, saturation: 0, brightnes: 0]
@@ -138,6 +262,10 @@ private void sendActions(Map<String, List> actions) {
 
 def parse(String description) {
     List<Map> events = parent.parseForDevice(device, description, getUseActivityLog())
+    def chainEvent = events.find { it.name == 'deviceChain' }
+    chainEvent?.data ? processChainData(chainEvent.data) : null
+    def tileEvent = events.find { it.name == 'tileState' }
+    tileEvent?.data ? updateTileChild(tileEvent.data) : null
     events.collect { createEvent(it) }
 }
 
