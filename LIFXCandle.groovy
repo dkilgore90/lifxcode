@@ -84,18 +84,21 @@ def setMatrix(String colors, duration = 0) {
     def colorsMap = new JsonSlurper().parseText(state.lastMatrix)
     colorsMap << new JsonSlurper().parseText(colors)
     def hsbkList = new Map<String, Object>[30]
-    for (int i = 0; i < 30; i++) {
-        String namedColor = colorsMap[i].color ?: colorsMap[i].colour
-        if (namedColor) {
-            Map myColor
-            myColor = (null == namedColor) ? null : parent.lookupColor(namedColor.replace('_', ' '))
-            hsbkList[i] = [
-                hue       : parent.scaleUp(myColor.h ?: 0, 360),
-                saturation: parent.scaleUp100(myColor.s ?: 0),
-                brightness: parent.scaleUp100(myColor.v ?: 50)
-            ]
-        } else {
-            hsbkList[i] = parent.getScaledColorMap(colorsMap[i])
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 5; j++) {
+            int index = (i * 5) + j
+            String namedColor = colorsMap[i][j].color ?: colorsMap[i][j].colour
+            if (namedColor) {
+                Map myColor
+                myColor = (null == namedColor) ? null : parent.lookupColor(namedColor.replace('_', ' '))
+                hsbkList[index] = [
+                    hue       : parent.scaleUp(myColor.h ?: 0, 360),
+                    saturation: parent.scaleUp100(myColor.s ?: 0),
+                    brightness: parent.scaleUp100(myColor.v ?: 50)
+                ]
+            } else {
+                hsbkList[index] = parent.getScaledColorMap(colorsMap[i][j])
+            }
         }
     }
     sendActions parent.deviceSetTileState(0, 1, 5, state.transitionTime ?: duration, colorsMap)
