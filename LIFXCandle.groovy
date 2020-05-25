@@ -164,8 +164,8 @@ private void sendActions(Map<String, List> actions) {
 
 def parse(String description) {
     List<Map> events = parent.parseForDevice(device, description, getUseActivityLog())
-    def tileEvent = events.find { it.name == 'tileState' }
-    state.lastMatrix = tileEvent?.data
+    def matrixEvent = events.find { it.name == 'matrixState' }
+    state.lastMatrix = matrixEvent?.data
     events.collect { createEvent(it) }
 }
 
