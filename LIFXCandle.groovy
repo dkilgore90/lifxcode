@@ -72,6 +72,19 @@ def requestInfo() {
     poll()
 }
 
+def updateLastMatrix(data) {
+    List matrix = []
+    for (int i = 0; i < 6; i++) {
+        List row = []
+        for (int j = 0; j < 5; j++) {
+            index = (i * 5) + j
+            row << data.colors[index]
+        }
+        matrix << row
+    }
+    state.lastMatrix = matrix
+}
+
 def on() {
     sendActions parent.deviceOnOff('on', getUseActivityLog(), state.transitionTime ?: 0)
 }
@@ -165,7 +178,7 @@ private void sendActions(Map<String, List> actions) {
 def parse(String description) {
     List<Map> events = parent.parseForDevice(device, description, getUseActivityLog())
     def matrixEvent = events.find { it.name == 'matrixState' }
-    state.lastMatrix = matrixEvent?.data
+    matrixEvent.?data ? updateLastMatrix(matrixEvent.data) : null
     events.collect { createEvent(it) }
 }
 
