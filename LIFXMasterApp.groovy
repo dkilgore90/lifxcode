@@ -911,7 +911,7 @@ List<Map> parseForDevice(device, String description, Boolean displayed, Boolean 
             Map data = parsePayload 'TILE.STATE_TILE_STATE', header
             data.matrixHtml = renderMatrix(data)
             return [
-                [name: 'tileState', data: data, displayed: false]
+                [name: 'matrixState', data: data, displayed: false]
             ]
         default:
             logWarn "Unhandled response for ${header.type}"

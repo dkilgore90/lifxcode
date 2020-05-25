@@ -264,7 +264,7 @@ def parse(String description) {
     List<Map> events = parent.parseForDevice(device, description, getUseActivityLog())
     def chainEvent = events.find { it.name == 'deviceChain' }
     chainEvent?.data ? processChainData(chainEvent.data) : null
-    def tileEvent = events.find { it.name == 'tileState' }
+    def tileEvent = events.find { it.name == 'matrixState' }
     tileEvent?.data ? updateTileChild(tileEvent.data) : null
     events.collect { createEvent(it) }
 }
