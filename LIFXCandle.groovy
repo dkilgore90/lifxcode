@@ -67,7 +67,7 @@ def refresh() {
 def poll() {
     parent.lifxQuery(device, 'DEVICE.GET_POWER') { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
-    parent.lifxCommand(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 5]) { List buffer -> sendPacket buffer, true } }
+    parent.lifxCommand(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 5]) { List buffer -> sendPacket buffer, true }
     parent.lifxQuery(device, 'TILE.GET_TILE_EFFECT') { List buffer -> sendPacket buffer }
 }
 
@@ -223,7 +223,7 @@ private void sendActions(Map<String, List> actions) {
 def parse(String description) {
     List<Map> events = parent.parseForDevice(device, description, getUseActivityLog())
     def matrixEvent = events.find { it.name == 'matrixState' }
-    matrixEvent.?data ? updateLastMatrix(matrixEvent.data) : null
+    matrixEvent?.data ? updateLastMatrix(matrixEvent.data) : null
     events.collect { createEvent(it) }
 }
 
