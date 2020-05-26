@@ -1808,6 +1808,7 @@ private Map deviceVersion(Map device) {
                             temperature_range: [min: 2500, max: 9000],
                             chain            : false,
                     ]
+            ]
         case 59:
             return [
                     name      : 'LIFX Mini Color',
