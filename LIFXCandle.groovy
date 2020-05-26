@@ -27,6 +27,9 @@ metadata {
         
         command "setMatrix", [[name: "Colors*", type: "JSON_OBJECT"], [name: "Duration", type: "NUMBER"]]
         command "setEffect", [[name: "Effect type*", type: "ENUM", constraints: ["FLAME", "MORPH", "OFF"]], [name: "Colors", type: "JSON_OBJECT"], [name: "Palette Count", type: "NUMBER"], [name: "Speed", type: "NUMBER"]]
+        command "matrixSave", [[name: "Matrix name*", type: "STRING"]]
+        command "matrixDelete", [[name: "Matrix name*", type: "STRING"]]
+        command "matrixLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
     }
 
     preferences {
@@ -82,7 +85,7 @@ def updateLastMatrix(data) {
         }
         matrix << row
     }
-    state.lastMatrix = matrix
+    state.lastMatrix = JsonOutput.toJson(matrix)
 }
 
 def on() {
@@ -91,6 +94,48 @@ def on() {
 
 def off() {
     sendActions parent.deviceOnOff('off', getUseActivityLog(), state.transitionTime ?: 0)
+}
+
+def matrixSave(String name) {
+    if (name == '') {
+        return
+    }
+    def matrixes = state.namedMatrixes ?: [:]
+    def theMatrixMap = [:]
+    def theMatrix = new JsonSlurper().parseText(state.lastMatrix)
+    logDebug("matrixSave - parsed input: $theMatrix")
+    for (int i = 0; i < 6; i++) {
+        theMatrix[i].eachWithIndex { v, k -> theMatrixMap[((i * 5) + k)] = v }
+    }
+    logDebug("matrixSave - input to compression: $theMatrixMap")
+    def compressed = parent.compressMatrixData theMatrixMap
+    matrixes[name] = compressed
+    state.namedMatrixes = matrixes
+    state.knownMatrixes = matrixes.keySet().toString()
+}
+
+def matrixLoad(String name, duration = 0) {
+    if (null == state.namedMatrixes) {
+        logWarn 'No saved matrixes'
+    }
+    def matrixString = state.namedMatrixes[name]
+    if (null == matrixString) {
+        logWarn "No such matrix $name"
+        return
+    }
+
+    def theMatrix = parent.getMatrix(matrixString)
+    logDebug "Sending $theMatrix"
+    sendActions parent.deviceSetTileState(0, 1, 5, state.transitionTime ?: duration, theMatrix)
+}
+
+def matrixDelete(String name) {
+    state.namedMatrixes?.remove(name)
+    updateKnownMatrixes()
+}
+
+private void updateKnownMatrixes() {
+    state.knownMatrixes = state.namedMatrixes?.keySet().toString()
 }
 
 def setMatrix(String colors, duration = 0) {
