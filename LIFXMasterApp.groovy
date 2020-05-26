@@ -710,7 +710,7 @@ Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer 
 
 Map<String, List> deviceSetTileState(index, length, width, duration, List hsbkList) {
     def actions = makeActions()
-    actions.commands << makeCommand('TILE.SET_TILE_STATE', [tile_index: index, length: length, x: 0, y: 0, width: 8, duration: duration, colors: hsbkList]
+    actions.commands << makeCommand('TILE.SET_TILE_STATE', [tile_index: index, length: length, x: 0, y: 0, width: 8, duration: duration, colors: hsbkList])
     actions
 }
 
