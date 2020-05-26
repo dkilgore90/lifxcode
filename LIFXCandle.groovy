@@ -12,7 +12,7 @@ import groovy.json.JsonOutput
  */
 
 metadata {
-    definition(name: 'LIFX Candle', namespace: 'robheyes', author: 'Robert Alan Heyes', importUrl: 'https://raw.githubusercontent.com/robheyes/lifxcode/master/LIFXTile.groovy') {
+    definition(name: 'LIFX Candle', namespace: 'robheyes', author: 'Robert Alan Heyes', importUrl: 'https://raw.githubusercontent.com/robheyes/lifxcode/master/LIFXCandle.groovy') {
         capability 'Light'
         capability 'ColorControl'
         capability 'ColorTemperature'
