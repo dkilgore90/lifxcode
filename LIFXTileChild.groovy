@@ -171,7 +171,7 @@ def setLevel(level, duration = 0) {
     device.sendEvent(name: "level", value: level)
 }
 
-private Map<int, Map> makePixels() {
+private Map<Integer, Map> makePixels() {
     def pixels = [:]
     for (int i = 0; i < 64; i++) {
         pixels[i] = [:]
@@ -180,9 +180,9 @@ private Map<int, Map> makePixels() {
     return pixels
 }
 
-private Map<int, Map> applyToAllPixels(Map colorMap, Map pixels) {
+private Map<Integer, Map> applyToAllPixels(Map colorMap, Map pixels) {
     for (int i = 0; i < 64; i++) {
-        pixels[i] << colorMap
+        pixels[i] << colorMap[i]
     }
     return pixels
 }
