@@ -33,6 +33,10 @@ metadata {
         attribute "rotation", "string"
         attribute "matrix", "string"
         //command "setState", ["MAP"]
+
+        command "matrixSave", [[name: "Matrix name*", type: "STRING"]]
+        command "matrixDelete", [[name: "Matrix name*", type: "STRING"]]
+        command "matrixLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
     }
 
     preferences {
@@ -80,6 +84,43 @@ def off() {
     parent.childSetTiles(getIndex(), pixels)
     device.sendEvent(name: "switch", value: "off")
     device.sendEvent(name: "level", value: 0)
+}
+
+def matrixSave(String name) {
+    if (name == '') {
+        return
+    }
+    def matrixes = state.namedMatrixes ?: [:]
+    def theMatrixMap = new JsonSlurper().parseText(state.lastMatrix)
+    logDebug("matrixSave - input to compression: $theMatrixMap")
+    def compressed = parent.compressMatrixData theMatrixMap
+    matrixes[name] = compressed
+    state.namedMatrixes = matrixes
+    state.knownMatrixes = matrixes.keySet().toString()
+}
+
+def matrixLoad(String name, duration = 0) {
+    if (null == state.namedMatrixes) {
+        logWarn 'No saved matrixes'
+    }
+    def matrixString = state.namedMatrixes[name]
+    if (null == matrixString) {
+        logWarn "No such matrix $name"
+        return
+    }
+
+    def theMatrix = parent.getMatrix(matrixString)
+    logDebug "Sending $theMatrix"
+    parent.childSetTiles(getIndex(), theMatrix, duration)
+}
+
+def matrixDelete(String name) {
+    state.namedMatrixes?.remove(name)
+    updateKnownMatrixes()
+}
+
+private void updateKnownMatrixes() {
+    state.knownMatrixes = state.namedMatrixes?.keySet().toString()
 }
 
 @SuppressWarnings("unused")

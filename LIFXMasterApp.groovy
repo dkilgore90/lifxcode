@@ -2590,4 +2590,55 @@ String renderMatrix(HashMap hashMap) {
     result
 }
 
+String rle(List<String> colors) {
+    StringBuilder builder = new StringBuilder('*')
+    StringBuilder uniqueBuilder = new StringBuilder('@')
+    String current = null
+    Integer count = 0
+    boolean allUnique = true
+    colors.each {
+        uniqueBuilder << it
+        uniqueBuilder << "\n"
+        if (it != current) {
+            if (count > 0) {
+                builder << sprintf("%02x\n", count)
+            }
+            count = 1
+            current = it
+            builder << current
+        } else {
+            count++
+            allUnique = false
+        }
+    }
+    if (count != 0) {
+        builder << sprintf('%02x', count)
+    }
+    if (allUnique) {
+        uniqueBuilder.toString()
+    } else {
+        builder.toString()
+    }
+}
 
+String hsbkToString(Map hsbk) {
+    sprintf '%04x%04x%04x%04x', hsbk.hue, hsbk.saturation, hsbk.brightness, hsbk.kelvin
+}
+
+String compressMatrixData(Map colors) {
+    logDebug "colors: $colors"
+    List<String> stringColors = []
+    for (int i = 0; i < 64; i++) {
+        Map hsbk = colors[i]
+        logDebug "Colors[$i]: $hsbk"
+        stringColors << hsbkToString(hsbk)
+    }
+    rle stringColors
+}
+
+Map getMatrix(String compressed) {
+    List<Map> colors = decompress(compressed).collect { stringToHsbk(it) }
+    def realColors = [:]
+    colors.eachWithIndex { v, k -> realColors[k] = v }
+    return realColors
+}

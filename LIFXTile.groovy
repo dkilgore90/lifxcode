@@ -28,6 +28,9 @@ metadata {
         
         command "setTiles", [[name: "Tile index*", type: "NUMBER"], [name: "Colors*", type: "JSON_OBJECT"], [name: "Number of tiles", type: "NUMBER"], [name: "Duration", type: "NUMBER"]]
         command "setEffect", [[name: "Effect type*", type: "ENUM", constraints: ["FLAME", "MORPH", "OFF"]], [name: "Colors", type: "JSON_OBJECT"], [name: "Palette Count", type: "NUMBER"], [name: "Speed", type: "NUMBER"]]
+        command "tilesSave", [[name: "Matrix name*", type: "STRING"]]
+        command "tilesDelete", [[name: "Matrix name*", type: "STRING"]]
+        command "tilesLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
     }
 
     preferences {
@@ -160,6 +163,30 @@ def off() {
     sendActions parent.deviceOnOff('off', getUseActivityLog(), state.transitionTime ?: 0)
 }
 
+def tilesSave(String name) {
+    def childresn = getChildDevices()
+    logInfo("Saving current tile state to name: $name in all child devices")
+    for (child in children) {
+        child.matrixSave(name)
+    }
+}
+
+def tilesLoad() {
+    def childresn = getChildDevices()
+    logInfo("Loading tile state from name: $name for all child devices")
+    for (child in children) {
+        child.matrixLoad(name)
+    }
+}
+
+def tilesDelete() {
+    def childresn = getChildDevices()
+    logInfo("Deleting tile state with name: $name from all child devices")
+    for (child in children) {
+        child.matrixDelete(name)
+    }
+}
+
 def setTiles(index, String colors, length = 1, duration = 0) {
     def child = getChildDevice(device.getDeviceNetworkId + "_tile$index")
     def childState = child.getState()
@@ -288,6 +315,11 @@ private void sendPacket(List buffer, boolean noResponseExpected = false) {
                     ]
             )
     )
+}
+
+def compressMatrixData(Map matrixMap) {
+    //passthrough to parent app
+    parent.compressMatrixData matrixMap
 }
 
 def getUseActivityLog() {
