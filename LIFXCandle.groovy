@@ -67,7 +67,7 @@ def refresh() {
 def poll() {
     parent.lifxQuery(device, 'DEVICE.GET_POWER') { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
-    parent.lifxCommand(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 5]) { List buffer -> sendPacket buffer, true }
+    parent.lifxQuery(device, 'TILE.GET_TILE_STATE', [tile_index: 0, length: 1, x: 0, y: 0, width: 5]) { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'TILE.GET_TILE_EFFECT') { List buffer -> sendPacket buffer }
 }
 
