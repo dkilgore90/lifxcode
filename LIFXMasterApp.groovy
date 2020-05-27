@@ -1029,6 +1029,10 @@ void lifxQuery(com.hubitat.app.DeviceWrapper device, String deviceAndType, Closu
     sendCommand deviceAndType, [:], true, sender
 }
 
+void lifxQuery(com.hubitat.app.DeviceWrapper device, String deviceAndType, Map payload, Closure<List> sender) {
+    sendCommand deviceAndType, payload, true, sender
+}
+
 @SuppressWarnings("unused")
 void lifxQuery(com.hubitat.app.DeviceWrapper device, List<String> deviceAndType, Closure<List> sender) {
     deviceAndType.each { sendCommand it, [:], true, sender }

@@ -67,13 +67,13 @@ def refresh() {
 
 @SuppressWarnings("unused")
 def poll() {
+    logDebug("polling tiles")
     parent.lifxQuery(device, 'DEVICE.GET_POWER') { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
     //If we pass a length > 1, LIFX will send multiple responses, 1 for each tile
     //Workaround to parse TILE.STATE_TILE_STATE for each tile
     for (int i = 0; i < state.tileCount ?: 1; i++) {
-        parent.lifxCommand(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 8]) { List buffer -> sendPacket buffer, true }
-    
+        parent.lifxQuery(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 8]) { List buffer -> sendPacket buffer }    
     }
     parent.lifxQuery(device, 'TILE.GET_TILE_EFFECT') { List buffer -> sendPacket buffer }
 }
@@ -164,7 +164,7 @@ def off() {
 }
 
 def tilesSave(String name) {
-    def childresn = getChildDevices()
+    def children = getChildDevices()
     logInfo("Saving current tile state to name: $name in all child devices")
     for (child in children) {
         child.matrixSave(name)
@@ -172,7 +172,7 @@ def tilesSave(String name) {
 }
 
 def tilesLoad() {
-    def childresn = getChildDevices()
+    def children = getChildDevices()
     logInfo("Loading tile state from name: $name for all child devices")
     for (child in children) {
         child.matrixLoad(name)
@@ -180,7 +180,7 @@ def tilesLoad() {
 }
 
 def tilesDelete() {
-    def childresn = getChildDevices()
+    def children = getChildDevices()
     logInfo("Deleting tile state with name: $name from all child devices")
     for (child in children) {
         child.matrixDelete(name)
