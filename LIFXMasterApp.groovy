@@ -1863,6 +1863,7 @@ private Map parseHeaderFromDescription(String description) {
 }
 
 private Map parsePayload(String deviceAndType, Map header) {
+    logDebug(deviceAndType)
     parseBytes descriptors[deviceAndType], getRemainder(header)
 }
 
@@ -1900,6 +1901,7 @@ private Map parseBytes(List<Map> descriptor, List<Long> bytes) {
     if (offset < bytes.size()) {
         result.put 'remainder', bytes[offset..-1]
     }
+    logDebug(result)
     return result
 }
 
