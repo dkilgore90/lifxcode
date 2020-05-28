@@ -31,6 +31,7 @@ metadata {
         command "tilesSave", [[name: "Matrix name*", type: "STRING"]]
         command "tilesDelete", [[name: "Matrix name*", type: "STRING"]]
         command "tilesLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
+        command "disable"
     }
 
     preferences {
@@ -65,9 +66,13 @@ def refresh() {
 
 }
 
+def disable() {
+    unschedule()
+}
+
 @SuppressWarnings("unused")
 def poll() {
-    logDebug("polling tiles")
+    log.debug("polling tiles")
     parent.lifxQuery(device, 'DEVICE.GET_POWER') { List buffer -> sendPacket buffer }
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
     //If we pass a length > 1, LIFX will send multiple responses, 1 for each tile
@@ -87,7 +92,7 @@ def getDeviceChain() {
 }
 
 def processChainData(data) {
-    logDebug("processing chain data: $data")
+    log.debug("processing chain data: $data")
     state.tileCount = data.total_count
     for (i=0; i<data.total_count; i++) {
         try {
@@ -231,7 +236,7 @@ def childSetTiles(index, Map colors, duration = 0) {
 }
 
 def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) {
-    logDebug("Effect inputs -- type: $effectType, speed: $speed, palette_count: $palette_count, colors: $colors")
+    log.debug("Effect inputs -- type: $effectType, speed: $speed, palette_count: $palette_count, colors: $colors")
     def colorsList = new JsonSlurper().parseText(colors)
     if (colorsList.size() >= 1) {
         palette_count = colorsList.size()
@@ -255,31 +260,31 @@ def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) 
             hsbkList[i] = [hue: 0, saturation: 0, brightnes: 0]
         }
     }
-    logDebug("Sending effect command -- type: $effectType, speed: $speed, palette_count: $palette_count, hsbkList: $hsbkList")
+    log.debug("Sending effect command -- type: $effectType, speed: $speed, palette_count: $palette_count, hsbkList: $hsbkList")
     sendActions parent.deviceSetTileEffect(effectType, speed.toInteger(), palette_count.toInteger(), hsbkList)
 }
 
 @SuppressWarnings("unused")
 def setColor(Map colorMap) {
-    logDebug("setColor: $colorMap")
+    log.debug("setColor: $colorMap")
     sendActions parent.deviceSetColor(device, colorMap, getUseActivityLogDebug(), state.transitionTime ?: 0)
 }
 
 @SuppressWarnings("unused")
 def setHue(hue) {
-    logDebug("setHue: $hue")
+    log.debug("setHue: $hue")
     sendActions parent.deviceSetHue(device, hue, getUseActivityLog(), state.transitionTime ?: 0)
 }
 
 @SuppressWarnings("unused")
 def setSaturation(saturation) {
-    logDebug("setSat: $saturation")
+    log.debug("setSat: $saturation")
     sendActions parent.deviceSetSaturation(device, saturation, getUseActivityLog(), state.transitionTime ?: 0)
 }
 
 @SuppressWarnings("unused")
 def setColorTemperature(temperature) {
-    logDebug("setTemp: $temperature")
+    log.debug("setTemp: $temperature")
     sendActions parent.deviceSetColorTemperature(device, temperature, getUseActivityLog(), state.transitionTime ?: 0)
 }
 
@@ -302,7 +307,7 @@ private String myIp() {
 }
 
 private void sendPacket(List buffer, boolean noResponseExpected = false) {
-    logDebug(buffer)
+    log.debug(buffer)
     String stringBytes = hubitat.helper.HexUtils.byteArrayToHexString parent.asByteArray(buffer)
     sendHubCommand(
             new hubitat.device.HubAction(
@@ -347,7 +352,7 @@ def setUseActivityLogDebug(value) {
     state.useActivityLogDebug = value
 }
 
-void logDebug(msg) {
+void log.debug(msg) {
     if (getUseActivityLogDebug()) {
         log.debug msg
     }
