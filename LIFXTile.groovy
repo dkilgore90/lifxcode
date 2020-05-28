@@ -87,6 +87,7 @@ def getDeviceChain() {
 }
 
 def processChainData(data) {
+    logDebug("processing chain data: $data")
     state.tileCount = data.total_count
     for (i=0; i<data.total_count; i++) {
         try {
@@ -119,8 +120,8 @@ def processChainData(data) {
 def updateTileChild(data) {
     def index = data.tile_index
     def child = getChildDevice(device.getDeviceNetworkId() + "_tile$index")
-    child.sendEvent(name: "matrix", value: data.matrixHtml)
-    child.sendEvent(name: "lastMatrix", value: JsonOutput.toJson(data.colors))
+    child ? child.sendEvent(name: "matrix", value: data.matrixHtml) : logWarn("child device not found for index $index")
+    child ? child.sendEvent(name: "lastMatrix", value: JsonOutput.toJson(data.colors)) : null
 }
 
 def determineRotation(int x, int y, int z) {
