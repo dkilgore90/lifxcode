@@ -772,13 +772,8 @@ Map<String, List> deviceSetLevel(com.hubitat.app.DeviceWrapper device, Number le
         hsbkMap.saturation = 0
         hsbkMap.duration = duration
     } else {
-        hsbkMap = [
-                hue       : scaleUp100(device.currentHue),
-                saturation: scaleUp100(device.currentSaturation),
-                brightness: scaleUp100(level),
-                kelvin    : device.currentColorTemperature,
-                duration  : duration,
-        ]
+        hsbkMap.brightness = scaleUp100 level
+        hsbkMap.duration = duration
     }
 
     deviceSetHSBKAndPower(device, duration, hsbkMap, displayed)

@@ -292,6 +292,10 @@ def setColorTemperature(temperature) {
     sendActions parent.deviceSetColorTemperature(device, temperature, getUseActivityLog(), state.transitionTime ?: 0)
 }
 
+def setLevel(level, duration = 0) {
+    sendActions parent.deviceSetLevel(device, level as Number, getUseActivityLog(), duration)
+}
+
 private void sendActions(Map<String, List> actions) {
     actions.commands?.each { item -> parent.lifxCommand(device, item.cmd, item.payload) { List buffer -> sendPacket buffer, true } }
     actions.events?.each { sendEvent it }
