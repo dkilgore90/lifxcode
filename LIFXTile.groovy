@@ -356,7 +356,7 @@ def setUseActivityLogDebug(value) {
     state.useActivityLogDebug = value
 }
 
-void log.debug(msg) {
+void logDebug(msg) {
     if (getUseActivityLogDebug()) {
         log.debug msg
     }
