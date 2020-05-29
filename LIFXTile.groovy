@@ -77,7 +77,9 @@ def poll() {
     parent.lifxQuery(device, 'LIGHT.GET_STATE') { List buffer -> sendPacket buffer }
     //If we pass a length > 1, LIFX will send multiple responses, 1 for each tile
     //Workaround to parse TILE.STATE_TILE_STATE for each tile
-    for (int i = 0; i < state.tileCount ?: 1; i++) {
+    log.debug("state.tileCount: ${state.tileCount}")
+    //for (int i = 0; i < state.tileCount ?: 1; i++) {
+    for (int i = 0; i < 5; i++) {
         parent.lifxQuery(device, 'TILE.GET_TILE_STATE', [tile_index: i, length: 1, x: 0, y: 0, width: 8]) { List buffer -> sendPacket buffer }    
     }
     parent.lifxQuery(device, 'TILE.GET_TILE_EFFECT') { List buffer -> sendPacket buffer }
