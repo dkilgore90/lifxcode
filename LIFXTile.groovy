@@ -32,6 +32,7 @@ metadata {
         command "tilesDelete", [[name: "Matrix name*", type: "STRING"]]
         command "tilesLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
         command "disable"
+        command "getDeviceChain"
     }
 
     preferences {
