@@ -19,6 +19,7 @@ metadata {
         capability 'Polling'
         capability 'Initialize'
         capability 'Switch'
+        capability 'SwitchLevel'
 
         attribute "label", "string"
         attribute "group", "string"

@@ -19,6 +19,7 @@ metadata {
         capability 'Polling'
         capability 'Initialize'
         capability 'Switch'
+        capability 'SwitchLevel'
 
         attribute "label", "string"
         attribute "group", "string"
@@ -260,7 +261,7 @@ def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) 
                 hsbkList[i] = parent.getScaledColorMap(colorsList[i])
             }
         } else {
-            hsbkList[i] = [hue: 0, saturation: 0, brightnes: 0]
+            hsbkList[i] = [hue: 0, saturation: 0, brightness: 0]
         }
     }
     log.debug("Sending effect command -- type: $effectType, speed: $speed, palette_count: $palette_count, hsbkList: $hsbkList")

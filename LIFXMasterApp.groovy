@@ -742,7 +742,10 @@ Map<String, List> deviceSetSaturation(com.hubitat.app.DeviceWrapper device, Numb
 }
 
 Map<String, List> deviceSetColorTemperature(com.hubitat.app.DeviceWrapper device, Number temperature, Boolean displayed, duration = 0) {
-    def hsbkMap = [kelvin: temperature, duration: duration, brightness: scaleUp(device.currentLevel as Long, 100)]
+    def hsbkMap = getCurrentHSBK device
+    hsbkMap.saturation = 0
+    hsbkMap.kelvin = temperature
+    hsbkMap.duration = duration
 
     deviceSetHSBKAndPower(device, duration, hsbkMap, displayed)
 }
