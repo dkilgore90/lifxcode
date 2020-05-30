@@ -693,7 +693,7 @@ Map<String, List> deviceSetMultiZoneEffect(String effectType, Integer speed, Str
     actions
 }
 
-Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer palette_count, List<Map> colors) {
+Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer palette_count, List colors) {
     def actions = makeActions()
     Integer typeInt
     switch (effectType) {
