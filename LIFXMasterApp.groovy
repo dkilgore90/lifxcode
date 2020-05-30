@@ -1922,7 +1922,7 @@ private void processSegment(Map result, List<Long> data, Map item, name, boolean
             data = data.reverse()
             Long value = 0
             data.each { value = (value * 256) + it }
-            def theFloat = Float.intBitsToFloat(value)
+            def theFloat = Float.intBitsToFloat(value as int)
             result.put name, theFloat
             break
         case 'T':
