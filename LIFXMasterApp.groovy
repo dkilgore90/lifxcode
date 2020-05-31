@@ -1933,7 +1933,7 @@ private void processSegment(Map result, List<Long> data, Map item, name, boolean
             result.put name, color
             break
         case 'M':
-            Map tile = parseBytes 'accel_meas_x:w;accel_meas_y:w;accel_meas_z:w;reserved1Tile:w;user_x:f;user_y:f;width:b;height:b;reserved2Tile:w;device_version_vendor:i;device_version_product:i;device_version_version:i;firmware_build:l;reserved3Tile:l;firmware_version_minor:w;firmware_version_major:w;reserved4Tile:i', data
+            Map tile = parseBytes 'accel_meas_x:w;accel_meas_y:w;accel_meas_z:w;reserved1Tile:w;user_x:f;user_y:f;width:b;height:b;reserved2Tile:b;device_version_vendor:i;device_version_product:i;device_version_version:i;firmware_build:l;reserved3Tile:l;firmware_version_minor:w;firmware_version_major:w;reserved4Tile:i', data
             result.put name, tile
             break
         default:
