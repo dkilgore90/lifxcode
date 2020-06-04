@@ -132,7 +132,7 @@ def updateTileChild(data) {
     def index = data.tile_index
     def child = getChildDevice(device.getDeviceNetworkId() + "_tile$index")
     child ? child.sendEvent(name: "matrix", value: data.matrixHtml) : logWarn("child device not found for index $index")
-    child ? child.sendEvent(name: "lastMatrix", value: JsonOutput.toJson(data.colors)) : null
+    child ? child.state.lastMatrix = JsonOutput.toJson(data.colors) : null
 }
 
 def deleteChildDevices() {
