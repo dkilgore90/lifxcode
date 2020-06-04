@@ -693,10 +693,10 @@ Map<String, List> deviceSetMultiZoneEffect(String effectType, Integer speed, Str
     actions
 }
 
-Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer palette_count, List<Map> hsbkList) {
+Map<String, List> deviceSetTileEffect(Map tileEffect) {
     def actions = makeActions()
     Integer typeInt
-    switch (effectType) {
+    switch (tileEffect.typeString) {
         case 'OFF':
             typeInt = 0
         case 'MORPH':
@@ -704,7 +704,7 @@ Map<String, List> deviceSetTileEffect(String effectType, Integer speed, Integer 
         case 'FLAME':
             typeInt = 3
     }
-    actions.commands << makeCommand('TILE.SET_TILE_EFFECT', [instanceId: 5439, type: typeInt, speed: speed * 1000, palette_count: palette_count, palette: hsbkList])
+    actions.commands << makeCommand('TILE.SET_TILE_EFFECT', [instanceId: 5439, type: typeInt, speed: tileEffect.speed * 1000, palette_count: tileEffect.palette_count, palette: tileEffect.colors])
     actions
 }
 
