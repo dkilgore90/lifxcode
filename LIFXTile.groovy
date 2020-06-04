@@ -119,7 +119,7 @@ def processChainData(data) {
     def children = getChildDevices()
     for (child in children) {
         def index = child.getDataValue("index") as Integer
-        def rotate = determineRotation(data.tile_devices[index].accel_meas_x, data.tile_devices[index].accel_meas_y, data.tile_devices[index].accel_meas_z)
+        def rotate = determineRotation(data.tile_devices[index].accel_meas_x as int, data.tile_devices[index].accel_meas_y as int, data.tile_devices[index].accel_meas_z as int)
         child.sendEvent(name: "width", value: data.tile_devices[index].width)
         child.sendEvent(name: "height", value: data.tile_devices[index].height)
         child.sendEvent(name: "user_x", value: data.tile_devices[index].user_x)
