@@ -105,7 +105,7 @@ def processChainData(data) {
                 'LIFX Tile Child',
                 device.getDeviceNetworkId() + "_tile$i",
                 [
-                        label   : "device.getDisplayName() Tile $i",
+                        label   : device.getDisplayName() + " Tile $i",
                         index   : "$i"
                 ]
             )
