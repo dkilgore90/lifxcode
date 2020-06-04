@@ -188,8 +188,9 @@ def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) 
             hsbkList[i] = [hue: 0, saturation: 0, brightnes: 0]
         }
     }
+    Map<String, Object> tileEffect = [typeString: effectType, speed: speed, palette_count: palette_count, colors: hsbkList]
     logDebug("Sending effect command -- type: $effectType, speed: $speed, palette_count: $palette_count, hsbkList: $hsbkList")
-    sendActions parent.deviceSetTileEffect(effectType, speed.toInteger(), palette_count.toInteger(), hsbkList)
+    sendActions parent.deviceSetTileEffect(tileEffect)
 }
 
 @SuppressWarnings("unused")
