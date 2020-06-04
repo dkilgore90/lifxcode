@@ -34,6 +34,7 @@ metadata {
         command "tilesLoad", [[name: "Matrix name*", type: "STRING",], [name: "Duration", type: "NUMBER"]]
         command "disable"
         command "getDeviceChain"
+        command "deleteChildDevices"
     }
 
     preferences {
@@ -132,6 +133,13 @@ def updateTileChild(data) {
     def child = getChildDevice(device.getDeviceNetworkId() + "_tile$index")
     child ? child.sendEvent(name: "matrix", value: data.matrixHtml) : logWarn("child device not found for index $index")
     child ? child.sendEvent(name: "lastMatrix", value: JsonOutput.toJson(data.colors)) : null
+}
+
+def deleteChildDevices() {
+    def children = getChildDevices()
+    for (child in children) {
+        deleteChildDevice(child.getDeviceNetworkId())
+    }
 }
 
 def determineRotation(int x, int y, int z) {
