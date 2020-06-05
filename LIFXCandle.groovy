@@ -169,6 +169,9 @@ def setEffect(String effectType, colors = '[]', palette_count = 0, speed = 30) {
     if (colorsList.size() >= 1 && palette_count == 0) {
         palette_count = colorsList.size()
     }
+    if (palette_count > 16) {
+        palette_count = 16
+    }
     def hsbkList = new Map<String, Object>[palette_count]
     for (int i = 0; i < palette_count; i++) {
         if (colorsList[i]) {
