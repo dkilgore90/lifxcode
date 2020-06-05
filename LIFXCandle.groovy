@@ -163,16 +163,21 @@ def setMatrix(String colors, duration = 0) {
     sendActions parent.deviceSetTileState(0, 1, 5, state.transitionTime ?: duration, colorsMap)
 }
 
-def setEffect(String effectType, colors = '[]', palette_count = 16, speed = 30) {
+def setEffect(String effectType, colors = '[]', palette_count = 0, speed = 30) {
     logDebug("Effect inputs -- type: $effectType, speed: $speed, palette_count: $palette_count, colors: $colors")
     def colorsList = new JsonSlurper().parseText(colors)
-    if (colorsList.size() >= 1) {
+    if (colorsList.size() >= 1 && palette_count == 0) {
         palette_count = colorsList.size()
     }
     def hsbkList = new Map<String, Object>[palette_count]
     for (int i = 0; i < palette_count; i++) {
         if (colorsList[i]) {
-            String namedColor = colorsList[i].color ?: colorsList[i].colour
+            String namedColor
+            if (colorsList[i] instanceof String) {
+                namedColor = colorsList[i]
+            } else {
+                namedColor = colorsList[i].color ?: colorsList[i].colour
+            }
             if (namedColor) {
                 Map myColor
                 myColor = (null == namedColor) ? null : parent.lookupColor(namedColor.replace('_', ' '))
