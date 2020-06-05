@@ -705,6 +705,7 @@ Map<String, List> deviceSetTileEffect(Map tileEffect) {
             typeInt = 3
     }
     actions.commands << makeCommand('TILE.SET_TILE_EFFECT', [instanceId: 5439, type: typeInt, speed: tileEffect.speed * 1000, palette_count: tileEffect.palette_count, palette: tileEffect.colors])
+    log.debug("Tile Effect: $actions")
     actions
 }
 
