@@ -695,6 +695,7 @@ Map<String, List> deviceSetMultiZoneEffect(String effectType, Integer speed, Str
 
 Map<String, List> deviceSetTileEffect(Map tileEffect) {
     def actions = makeActions()
+    def params = new int[8]
     Integer typeInt
     switch (tileEffect.typeString) {
         case 'OFF':
@@ -704,7 +705,7 @@ Map<String, List> deviceSetTileEffect(Map tileEffect) {
         case 'FLAME':
             typeInt = 3
     }
-    actions.commands << makeCommand('TILE.SET_TILE_EFFECT', [instanceId: 5439, type: typeInt, speed: tileEffect.speed * 1000, palette_count: tileEffect.palette_count, palette: tileEffect.colors])
+    actions.commands << makeCommand('TILE.SET_TILE_EFFECT', [instanceId: 5439, type: typeInt, speed: tileEffect.speed * 1000, palette_count: tileEffect.palette_count, palette: tileEffect.colors, parameters: params])
     log.debug("Tile Effect: $actions")
     actions
 }
