@@ -1,5 +1,4 @@
 import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
 
 /**
  *
@@ -134,7 +133,7 @@ def updateTileChild(data) {
     def index = data.tile_index
     def child = getChildDevice(device.getDeviceNetworkId() + "_tile$index")
     child ? child.sendEvent(name: "matrix", value: data.matrixHtml) : logWarn("child device not found for index $index")
-    child ? child.state.lastMatrix = JsonOutput.toJson(data.colors) : null
+    child ? child.updateLastMatrix(data.colors) : null
 }
 
 def deleteChildDevices() {

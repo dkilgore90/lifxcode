@@ -1966,8 +1966,9 @@ private List makePayload(String deviceAndType, Map payload) {
         Map item ->
             if ('H' == item.kind) {
                 if (item.isArray) {
+                    def colors = payload.colors ?: payload.palette
                     for (int i = 0; i < item.count; i++) {
-                        Map hsbk = (payload.colors[i] ?: payload.palette[i]) as Map
+                        Map hsbk = colors[i] as Map
                         add result, (hsbk['hue'] ?: 0) as short
                         add result, (hsbk['saturation'] ?: 0) as short
                         add result, (hsbk['brightness'] ?: 0) as short
@@ -1981,6 +1982,7 @@ private List makePayload(String deviceAndType, Map payload) {
                 }
                 return
             }
+            //TODO check item.isArray and default to empty List if null
             def value = payload[item.name] ?: 0
             //TODO possibly extend this to the other types A,S & B
             switch (item.size as int) {

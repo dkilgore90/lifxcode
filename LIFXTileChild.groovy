@@ -119,6 +119,10 @@ def matrixDelete(String name) {
     updateKnownMatrixes()
 }
 
+def updateLastMatrix(Map colors) {
+    state.lastMatrix = JsonOutput.toJson(colors)
+}
+
 private void updateKnownMatrixes() {
     state.knownMatrixes = state.namedMatrixes?.keySet().toString()
 }
