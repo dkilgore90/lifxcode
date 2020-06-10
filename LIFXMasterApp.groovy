@@ -1966,7 +1966,7 @@ private List makePayload(String deviceAndType, Map payload) {
         Map item ->
             if ('H' == item.kind) {
                 if (item.isArray) {
-                    def colors = payload.colors ?: payload.palette
+                    def colors = payload.colors ?: (payload.palette as List)
                     for (int i = 0; i < item.count; i++) {
                         Map hsbk = colors[i] as Map
                         add result, (hsbk?.hue ?: 0) as short
