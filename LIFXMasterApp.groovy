@@ -1969,10 +1969,10 @@ private List makePayload(String deviceAndType, Map payload) {
                     def colors = payload.colors ?: payload.palette
                     for (int i = 0; i < item.count; i++) {
                         Map hsbk = colors[i] as Map
-                        add result, (hsbk['hue'] ?: 0) as short
-                        add result, (hsbk['saturation'] ?: 0) as short
-                        add result, (hsbk['brightness'] ?: 0) as short
-                        add result, (hsbk['kelvin'] ?: 0) as short
+                        add result, (hsbk?.hue ?: 0) as short
+                        add result, (hsbk?.saturation ?: 0) as short
+                        add result, (hsbk?.brightness ?: 0) as short
+                        add result, (hsbk?.kelvin ?: 0) as short
                     }
                 } else {
                     add result, (payload.color['hue'] ?: 0) as short
