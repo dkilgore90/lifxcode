@@ -85,6 +85,30 @@ NOTES:
 the parent properly - e.g. flip the "switch" on, off, and on again.  Will see if this can be addressed in a
 future update.
 
+### Matrix input for Candle color
+the "Colors" input should be a Json-formatted input, similar to:
+```[
+  [ {"hue":50, "saturation":100, "brightness": 75, "kelvin": 3500} ],
+  [ {<hsbk values>}, {}, {}, {}, {} ]
+  [...]
+  [...]
+  [...]
+  [...]
+]```
+matching the matrix layout shown here: Updating the HTTP API and LAN Protocol docs for the Candle Colour - Developing with LIFX - LIFX Developer Zone 1 - one value in the first row, for the led on top - then the remaining rows wrap around the bulb. You can specify as many or as few of the hsbk values as you want, and mix and match specifying only hue, only kelvin, only brightness, etc based on what you want to change from the current settings - at least that's the intent. If you want to skip a matrix field, make sure to include an empty object to maintain the proper positioning for others.
+
+### Indexed map input for Tile
+the "Colors" input is currently coded to accept an indexed Map of objects, again in JSON format, e.g.
+```{
+  "0": {"hue":50, "saturation":100, "brightness": 75, "kelvin": 3500},
+  "1": {<hsbk values>},
+  ...
+  "63": {},
+  "64": {}
+}```
+Likewise, mix and match which values that you want/need to specify - and you can skip any indexes that you don't want to change at all.
+Indexes 0-7 set the first row, 8-15 the second row, and so on.
+
 ## Troubleshooting
 ### Undiscovered devices
 If you find that some devices aren't discovered
